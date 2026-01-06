@@ -1,4 +1,4 @@
-import { centerChangeable, magnit, changeCenter } from "./useConfig.js"
+import { centerChangeable, magnit} from "./useConfig.js"
 
 let offsetX = 0
 let offsetY = 0
@@ -25,11 +25,11 @@ export function startMovingCenter(event) {
     // 4. Якщо цикл анімації ще не запущений, запускаємо його
     //    (Ми перевіряємо, щоб не запускати 100 циклів одночасно)
     if (!animationFrameId) {
-        animationLoop()
+        animationLoop(targetPosition)
     }
 }
 
-function onMouseMoveCenter(event) {
+export function onMouseMoveCenter(event) {
     // Поки ми рухаємо мишу, ми просто оновлюємо ціль
     targetPosition.x = event.clientX - offsetX
     targetPosition.y = event.clientY - offsetY
@@ -37,7 +37,7 @@ function onMouseMoveCenter(event) {
     // (Важливо) Якщо анімація раптом зупинилася (допливла),
     // а ми знову посунули мишу, треба її "розбудити" і запустити знову.
     if (!animationFrameId) {
-        animationLoop()
+        animationLoop(targetPosition)
     }
 }
 
@@ -48,12 +48,12 @@ function stopMovingCenter(event) {
 }
 
 // Цикл анімації
-function animationLoop() {
+export function animationLoop() {
 
     const currentX = centerChangeable.value.x
     const currentY = centerChangeable.value.y
-    const targetX = targetPosition.x
-    const targetY = targetPosition.y
+    const targetX = Math.round(targetPosition.x / magnit.value) * magnit.value
+    const targetY = Math.round(targetPosition.y / magnit.value) * magnit.value
 
     const stopCondition = 0.1
     if (Math.abs(targetX - currentX) < stopCondition &&
@@ -67,7 +67,15 @@ function animationLoop() {
         return // Виходимо з функції, не запитуючи наступний кадр
     }
 
-    changeCenter(targetX, targetY)
+    // Розраховуємо різницю (відстань до цілі)
+    let distanceX = targetX - currentX;
+    let distanceY = targetY - currentY;
+
+    const smoothingFactor = 0.1;  // Чим менше значення, тим плавніше рух
+
+    // Рухаємося на ЧАСТИНУ цієї відстані (на 10% в даному випадку)
+    centerChangeable.value.x = currentX + distanceX * smoothingFactor;
+    centerChangeable.value.y = currentY + distanceY * smoothingFactor;
 
     animationFrameId = requestAnimationFrame(animationLoop)
 }

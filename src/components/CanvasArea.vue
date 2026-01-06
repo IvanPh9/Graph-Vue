@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue"
 import {
-  margin, width, height, magnit, centerChangeable, center, changeCenter, increaseMagnit, decreaseMagnit,} from "@/composables/useConfig.js"
+  margin, width, height, magnit, centerChangeable, center, increaseMagnit, decreaseMagnit,} from "@/composables/useConfig.js"
 import { lines, previewLine } from "@/composables/useLines.js"
 import { buttons, preventClick } from "@/composables/useButtons.js"
 
@@ -10,7 +10,7 @@ import {onMouseMovePreview} from "@/composables/useLines.js";
 
 import ButtonNode from "./ButtonNode.vue"
 import ConnectionLine from "./ConnectionLine.vue"
-import {startMovingCenter} from "@/composables/useCanvas.js";
+import {startMovingCenter, animationLoop} from "@/composables/useCanvas.js";
 
 window.addEventListener("mousemove", onMouseMovePreview)
 window.addEventListener("keydown", handleKeyPress)
@@ -43,7 +43,16 @@ function handleMouseDown(event) {
               :y2="previewLine.y"
               stroke="blue" stroke-width="1" stroke-dasharray="5,5"/>
       </svg>
-      <div :style="{ position: 'absolute', top: center.y + 'px', left: center.x + 'px', width: '5px', height: '5px', backgroundColor: 'red', transform: 'translate(-50%, -50%)' }"></div>
+      <div :style="{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    transform: `translate(${center.x}px, ${center.y}px) translate(-50%, -50%)`,
+    width: '5px',
+    height: '5px',
+    backgroundColor: 'red',
+    willChange: 'transform'
+}"></div>
       <ButtonNode v-for="b in buttons" :key="b.id" :button="b" />
     </div>
     <div class="flex-initial">
@@ -98,11 +107,12 @@ function handleMouseDown(event) {
         <button @click="increaseMagnit" class="px-1 py-2 bg-amber-300">+5 px</button>
         <button @click="decreaseMagnit" class="px-1 py-2 bg-amber-400">-5 px</button>
         <p>Центр x {{centerChangeable.x}}</p>
-        <button @click="changeCenter(-1, 0)" class="px-1 py-2 bg-emerald-300">-1 px</button>
-        <button @click="changeCenter(1, 0)" class="px-1 py-2 bg-emerald-400">+1 px</button>
+        <button @click="" class="px-1 py-2 bg-emerald-300">-1 px</button>
+        <button @click="" class="px-1 py-2 bg-emerald-400">+1 px</button>
         <p>Центр y {{centerChangeable.y}}</p>
-        <button @click="changeCenter(0, -1)" class="px-1 py-2 bg-emerald-300">-1 px</button>
-        <button @click="changeCenter(0, 1)" class="px-1 py-2 bg-emerald-400">+1 px</button>
+        <button @click="" class="px-1 py-2 bg-emerald-300">-1 px</button>
+        <button @click="" class="px-1 py-2 bg-emerald-400">+1 px</button>
+
       </div>
     </div>
   </div>
